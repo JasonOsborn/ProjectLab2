@@ -3,7 +3,7 @@ import math
 import time
 
 
-#import busio
+import busio
 import board
  
 import numpy as np
@@ -14,7 +14,7 @@ from colour import Color
 
 #import adafruit_amg88xx
  
-#i2c_bus = busio.I2C(board.SCL, board.SDA)
+i2c_bus = busio.I2C(board.SCL, board.SDA)
 
 
 # Define new functions:
