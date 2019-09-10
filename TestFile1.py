@@ -1,10 +1,13 @@
+# Note: Prior to importing busio and adafruit_(anything), you have to install them via cmd prompt
+
 import os
 import math
 import time
 
 
 import busio
-import board
+import adafruit_blinka.board.raspi_1b_rev2 as board
+
  
 import numpy as np
 import pygame
@@ -12,7 +15,7 @@ from scipy.interpolate import griddata
  
 from colour import Color
 
-#import adafruit_amg88xx
+import adafruit_amg88xx
  
 i2c_bus = busio.I2C(board.SCL, board.SDA)
 
@@ -23,7 +26,20 @@ i2c_bus = busio.I2C(board.SCL, board.SDA)
 def constrain(val, min_val, max_val):
     return min(max_val, max(min_val, val))
 
-# ??
+# ?? Function unknown
+"""
+Analysis, not code:
+in_min = the minimum temp we define (blue)
+in_max = max temp we define (red)
+out_min = 0
+out_max = colorvariance - 1 (basically defines how many points colorvariance creates)
+x = p = each pixel on the screen
+
+so, (x-in_min)*(colorvariance)/(degree variance) + 0
+so, (x-in_min)*(# of degree steps at the end) ??
+I don't understand what this is for.
+I THINK that it saves the value of each pixel the sensor scans, and redefines it in terms of the established color variance stuff outside the functional while loop.
+"""
 def map_value(x, in_min, in_max, out_min, out_max):
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
@@ -38,10 +54,8 @@ COLORVARIANCE = 1024 # Number of color values
 os.putenv('SDL_FBDEV', '/dev/fb1')
 pygame.init()
 
-""" 
 #initialize the sensor
 sensor = adafruit_amg88xx.AMG88XX(i2c_bus)
-"""
 
 points = [(math.floor(ix / 8), (ix % 8)) for ix in range(0, 64)] # Creates 8x8 (?) array
 
@@ -87,7 +101,7 @@ while True:
     pixels = []
     for row in sensor.pixels:
         pixels = pixels + row
-    pixels = [map_value(p, MINTEMP, MAXTEMP, 0, COLORDEPTH - 1) for p in pixels]
+    pixels = [map_value(p, MINTEMP, MAXTEMP, 0, COLORVARIANCE - 1) for p in pixels]
  
     #perform interpolation
     bicubic = griddata(points, pixels, (grid_x, grid_y), method='cubic')
@@ -95,7 +109,7 @@ while True:
     #draw everything
     for ix, row in enumerate(bicubic):
         for jx, pixel in enumerate(row):
-            pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)],
+            pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORVARIANCE- 1)],
                              (displayPixelHeight * ix, displayPixelWidth * jx,
                               displayPixelHeight, displayPixelWidth))
  
