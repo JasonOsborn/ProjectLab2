@@ -2,25 +2,49 @@
 # Ensure on-board functionality
 # Impliment Autoadjustment of Min/Max temp- POSSIBLE
 # Determine use of map_value function
+#! Adafruit has it's own library- Do the others?
 
-import os
-import math
+# Basic clock
 import time
 
+# I/O reading
+import os
+import fnmatch
 import busio
 import board
 
+# Data manipulation
+import math
 import numpy
-import pygame as screen
 from scipy.interpolate import griddata
+
+# Display
+import pygame as screen
 from colour import Color
 
 # Sensor Specific- Adafruit has its own library, do the others?
 import adafruit_amg88xx
 
+# Define bus
 i2c_bus = busio.I2C(board.SCL, board.SDA)
 
 ##Define Custom Functions
+# Number Function
+#   Locates the first unused Image file name in format "image[Num].jpg" where Num is an arbitrary interger
+def Numbr(USB_Path)
+    Num = 0
+    listFiles = os.listdir(USB_Path)
+    if len(listFiles) == 0:
+        return 0
+    else
+        for file in listFiles:
+            if not(fnmatch.fnmatch(file, "image" + str(Num) + ".jpg")):
+                return Num
+            else
+                Num = Num + 1
+            
+    return 0
+
 # Constrain Function
 #   Constraints value of temperature/color between defined bounds- Autoadjustment *is* possible, but not easy/ideal. Do anyway?
 def constrain(val, min_val, max_val):
@@ -43,7 +67,6 @@ COLORVARIANCE = 1024 # How many different colors can we display?
 os.putenv('SDL_FBDEV', '/dev/fb1') 
 #Defines the USB file path as arbitrary variable named USB_Path
 os.putenv('USB_Path','')
-
 
 ## Device Initialization
 #Initialize screen
@@ -98,7 +121,7 @@ screen.display.update()
 time.sleep(.1)
 
 # Initialize 
-Num = 0
+Num = Numbr(USB_Path)
 t0 = 0
 
 while True:
@@ -121,9 +144,12 @@ while True:
                               displayPixelHeight, displayPixelWidth))
  
     screen.display.update()
-    t1 = time.clock() - t0
     
+    ## Screenshot functionality
+    # Debouncing + Initial Button Input:
+    t1 = time.clock() - t0
     if buttonInput and t1 > 0.3:
         t0 = time.clock()
+        # Save a screenshot of the current screen @ USB_Path called image[Num].jpg where Num is an arbitrary number
         screen.image.save(img, USB_Path + "image" + str(Num) + ".jpg")
         Num = Num + 1
