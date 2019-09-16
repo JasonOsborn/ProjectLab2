@@ -6,7 +6,7 @@ import time
 
 
 import busio
-import adafruit_blinka.board.raspi_1b_rev2 as board
+import board
 
  
 import numpy as np
@@ -59,7 +59,7 @@ sensor = adafruit_amg88xx.AMG88XX(i2c_bus)
 
 points = [(math.floor(ix / 8), (ix % 8)) for ix in range(0, 64)] # Creates 8x8 (?) array
 
-grid_x, grid_y = np.mgrid[0:7:32j, 0:7:32j] # Creates 2 grids from 0 to 7 w/ 32 points each, including 0 & 7 as points #Requires np
+grid_x, grid_y = np.mgrid[0:7:32j, 0:7:32j] # Creates 2 grids from 0 to 7 w/ 31 jumps each #Requires np
 
 
 # Screen
@@ -104,6 +104,7 @@ while True:
     pixels = [map_value(p, MINTEMP, MAXTEMP, 0, COLORVARIANCE - 1) for p in pixels]
  
     #perform interpolation
+    #-> Interprets best fit for missing data?
     bicubic = griddata(points, pixels, (grid_x, grid_y), method='cubic')
  
     #draw everything
