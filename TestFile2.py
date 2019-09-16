@@ -37,8 +37,8 @@ def Numbr(USB_Path)
     if len(listFiles) == 0:
         return 0
     else
-        for file in listFiles:
-            if not(fnmatch.fnmatch(file, "image" + str(Num) + ".jpg")):
+        for fileName in listFiles:
+            if not(fnmatch.fnmatch(fileName, "image" + str(Num) + ".jpg")):
                 return Num
             else
                 Num = Num + 1
