@@ -1,8 +1,10 @@
 ## TODO:
-# Ensure on-board functionality
+    # **note: #! = important TODO**
+#! Ensure on-board functionality
 # Impliment Autoadjustment of Min/Max temp- POSSIBLE
 # Determine use of map_value function
 #! Adafruit has it's own library- Do the others?
+#! buttonInput has no connected port. Important.
 
 # Basic clock
 import time
@@ -27,6 +29,8 @@ import adafruit_amg88xx
 
 # Define bus
 i2c_bus = busio.I2C(board.SCL, board.SDA)
+
+
 
 ##Define Custom Functions
 # Number Function
