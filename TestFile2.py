@@ -28,6 +28,7 @@ from colour import Color
 
 # Sensor Specific- Adafruit has its own library, do the others?
 import adafruit_amg88xx
+import MLX90640
 
 # Define bus
 i2c_bus = busio.I2C(board.SCL, board.SDA)
@@ -104,8 +105,7 @@ COLORVARIANCE = 1024 # How many different colors can we display?
     #Unused?
 os.putenv('SDL_FBDEV', '/dev/fb1') 
 #Defines the USB file path as arbitrary variable named ScreenCap
-os.putenv('ScreenCap','/media/pi/<HARD-DRIVE-LABEL>')
-    ##! Possibly incorect?
+os.putenv('ScreenCap','/media/pi/<HARD-DRIVE-LABEL>') #! Determine USB path
 
 ## Device Initialization
 #Initialize screen
@@ -124,10 +124,10 @@ else
 ##Screen
 # To adjust number of pixels on screen, adjust height, width, or displayPixelHeight or displayPixelWidth
 height = 240
-width = 240
+width = 320
 
-displayPixelWidth = width / 30
-displayPixelHeight = height / 30
+displayPixelWidth = width / (width / 8)
+displayPixelHeight = height / (height / 8)
 
 #Colors for the screen, from blue('indigo') to red. Number of jumps between is COLORVARIANCE
 
@@ -139,12 +139,12 @@ colors = [(int(c.red * 255), int(c.green * 255), int(c.blue * 255)) for c in col
 
 # Boot commands for the screen
 LiveCap = screen.display.set_mode((width, height))
- 
+
 LiveCap.fill((255, 0, 0))
- 
+
 screen.display.update()
 screen.mouse.set_visible(False)
- 
+
 LiveCap.fill((0, 0, 0))
 screen.display.update()
 
@@ -154,6 +154,7 @@ time.sleep(.1)
 Num = Numbr(ScreenCap)
 t0 = 0
 
+'''
 #Locate I2C active port
 active = [] # Create empty array 'active'
 active = [hex(x) for x in busio.I2C.scan()]
@@ -162,14 +163,22 @@ if (len(active) == 1)
     i2c_active_address = hex(busio.I2C.scan())
 else
     exit() #Just close the program.
-    
+'''  
 
 while True:
 
     #read the pixels
     pixelArray = [] # Creates empty array
-    for row0 in sensor['SensorName'].pixels: #Defines array as containing 'sensor' data
-        pixelArray = pixelArray + row0 # Note '+' here is append, not add
+    if sensor['SensorName'] == 'MLX'
+        for row0 in range(0,24):
+            for column in range(0,32):
+                pixels = pixels + sensor.getCompensatedPixData(row0,column)
+    else if senor['SensorName'] == 'ADA'
+        for row0 in sensor['SensorName'].pixels: #Defines array as containing 'sensor' data
+            pixelArray = pixelArray + row0 # Note '+' here is append, not add
+    else #FLIR
+        for row0 in sensor['SensorName'].pixels: #Defines array as containing 'sensor' data
+            pixelArray = pixelArray + row0 # Note '+' here is append, not add
     pixelArray = [map_value(p, MINTEMP, MAXTEMP, 0, COLORVARIANCE - 1) for p in pixelArray] #Redefines 'pixels' data onto the 1024 range
 
     #perform interpolation
