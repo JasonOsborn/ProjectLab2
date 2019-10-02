@@ -75,7 +75,11 @@ def constrain(val, min_val, max_val):
     return min(max_val, max(min_val, val))
 
 def map_value(x, in_min, in_max, out_min, out_max):
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+    ReturnVal = (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+    file3 = open("Map_ValueFunct.txt","a")
+    file3.writeline("x => " + str(ReturnVal),"a")
+    file3.close
+    return ReturnVal
 
 #let the sensor initialize
 time.sleep(.1)
@@ -86,10 +90,18 @@ while True:
     pixels = []
     for row in sensor.pixels:
         pixels = pixels + row
+    file1 = open("PixelsRows.txt","a")
+    file1.writelines(i) for i in pixels
+    file1.writeline("__End__")
+    file1.close
     pixels = [map_value(p, MINTEMP, MAXTEMP, 0, COLORDEPTH - 1) for p in pixels]
 
     #perform interpolation
     bicubic = griddata(points, pixels, (grid_x, grid_y), method='cubic')
+    file2 = open("PostBicubicData.txt","a")
+    file2.writelines(i) for i in bicubic
+    file2.writeline("__End__")
+    file2.close
 
     #draw everything
     for ix, row in enumerate(bicubic):
@@ -105,10 +117,8 @@ while True:
         str_now = str(now)
         d_str = str_now[5:10]
         d_str1 = str_now[11:19]#f_date displays m-d_h-m-s time
-        f_date = d_str+"_"+d_str1[0:2]+"-"+d_str1[3:5]+\
-                 "-"+d_str1[6:8]
-        image_file = "scrot /media/pi/5BD7-E1141/sample"\
-                     +f_date+".png"    
+        f_date = d_str+"_"+d_str1[0:2]+"-"+d_str1[3:5]+"-"+d_str1[6:8]
+        image_file = "scrot /media/pi/5BD7-E1141/sample"+f_date+".png"    
         os.system(image_file)
         
         print("f_date = ")
