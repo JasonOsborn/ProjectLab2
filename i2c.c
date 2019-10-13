@@ -95,7 +95,7 @@ char *i2c_get_device_desc(const I2CDevice *device, char *buf, size_t size)
 **	2. it can choice ignore or not ignore i2c internal address
 **
 */
-ssize_t i2c_ioctl_read(const I2CDevice *device, unsigned int iaddr, void *buf, size_t len)
+ssize_t i2c_ioctl_read(const I2CDevice *device, unsigned int iaddr, unsigned char *buf, size_t len)
 {
     struct i2c_msg ioctl_msg[2];
     struct i2c_rdwr_ioctl_data ioctl_data;
@@ -152,7 +152,7 @@ ssize_t i2c_ioctl_read(const I2CDevice *device, unsigned int iaddr, void *buf, s
 }
 
 
-ssize_t i2c_ioctl_write(const I2CDevice *device, unsigned int iaddr, const void *buf, size_t len)
+ssize_t i2c_ioctl_write(const I2CDevice *device, unsigned int iaddr, const unsigned char *buf, size_t len)
 {
     ssize_t remain = len;
     size_t size = 0, cnt = 0;
@@ -259,7 +259,7 @@ ssize_t i2c_read(const I2CDevice *device, unsigned int iaddr, void *buf, size_t 
 **	#len	:	buf data length without '/0'
 **	@return	: 	success return write data length, failed -1
 */
-ssize_t i2c_write(const I2CDevice *device, unsigned int iaddr, const void *buf, size_t len)
+ssize_t i2c_write(const I2CDevice *device, unsigned int iaddr, const unsigned char *buf, size_t len)
 {
     ssize_t remain = len;
     size_t cnt = 0, size = 0;
